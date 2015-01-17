@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'eclipse'
 
 sourceCompatibility = '1.6'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -16,14 +17,23 @@ repositories {
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
+    
+    maven {
+        name 'turpid monkeys' 
+        url 'https://dl.bintray.com/turpid-monkey/maven'
+    }  
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.10'
+    testCompile group: 'org.easymock', name: 'easymock', version: '3.3'
     
     compile (group: 'eu.mihosoft.vrl', name: 'vrl', version: '0.4.2.8.6-SNAPSHOT')
     compile (group: 'eu.mihosoft.vrl', name: 'vrl', version: '0.4.2.8.6-SNAPSHOT', classifier: 'sources')
     compile (group: 'eu.mihosoft.vrl', name: 'vrl', version: '0.4.2.8.6-SNAPSHOT', classifier: 'javadoc')
+    
+    compile (group: 'edu.gcsc.lua', name: 'luaautocomplete', version: '0.1')
+    compile (group: 'edu.gcsc.uglua', name: 'ug4luaautocomplete', version: '0.1')
     
     
     compile (group: 'org.luaj', name: 'luaj-jse', version: '3.0')
