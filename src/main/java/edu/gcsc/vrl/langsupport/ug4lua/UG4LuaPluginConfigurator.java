@@ -30,12 +30,12 @@ public class UG4LuaPluginConfigurator extends VPluginConfigurator{
        // exportPackage("com.your.package");
 
        // describe the plugin
-       setDescription("Plugin Description");
+       setDescription("LUA code completion for UG4 shell scripts.");
 
        // copyright info
-       setCopyrightInfo("Sample-Plugin",
-               "(c) Your Name",
-               "www.you.com", "License Name", "License Text...");
+       setCopyrightInfo("VRL-UG4-Lua-Support",
+               "(c) 2014 Goethe Center for Scientific Computing, Goethe University Frankfurt.",
+               "http://gcsc.uni-frankfurt.de", "BSD 2-Clause", "http://opensource.org/licenses/BSD-2-Clause");
 
        // specify dependencies
        // addDependency(new PluginDependency("VRL", "0.4.0", "0.4.0"));
@@ -69,7 +69,7 @@ public class UG4LuaPluginConfigurator extends VPluginConfigurator{
            // vapi.addComponent(MyComponent.class);
            // vapi.addTypeRepresentation(MyType.class);
            
-           vapi.addEditorConfiguration(new LuaEditorConfiguration());
+           vapi.addEditorConfiguration(new UG4LuaEditorConfiguration());
            
            vapi.addTypeRepresentation(InputUG4LuaCodeType.class);
        }

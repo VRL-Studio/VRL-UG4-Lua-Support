@@ -35,7 +35,6 @@ import org.fife.ui.autocomplete.CompletionProvider;
 import org.fife.ui.autocomplete.FunctionCompletion;
 import org.fife.ui.autocomplete.ParameterizedCompletion.Parameter;
 import org.fife.ui.autocomplete.ShorthandCompletion;
-import edu.gcsc.lua.IconLib;
 
 /**
  * @author Martin Rupp
@@ -115,12 +114,7 @@ public class StaticLuaCompletions {
 					"turn stuff to string",
 					"Receives an argument of any type and converts it to a string in a reasonable format. Specify __tostring in your class to use in ug4 registry" },
 			{ "BC", "require", "declare file dependency",
-					"don't use require. use ug_load_script." },
-			{
-					"BC",
-					"ug_load_script(",
-					"load file via UG shell",
-					"ug_load_script(filename)<br>loads a lua script and executes it.<br>Loads lua scripts from<br>- relative to current script<br>- ug4/scripts<br>- ug4/apps<br>- ug4/<br>- as absolute filename<br>This function is efficient in parallel. However, you have to assure that you call ug_load_script on all cores." },
+					"loads a script." },
 			{ "PC", "string.byte", "string.byte (s [, i [, j]])", "byte", "s",
 					"i", "j" },
 			{ "PC", "string.find",
@@ -233,9 +227,8 @@ public class StaticLuaCompletions {
 			{ "PC", "os.rename", "os.rename (oldname, newname)", "bool",
 					"oldname", "newname" },
 			{ "PC", "os.time", "os.time ([table])", "date", "table" },
-			{ "PC", "os.tmpname", "os.tmpname()", "file" },
-			{ "BC", "breakpoint()", "add breakpoint",
-					"add a ug4 LUA breakpoint at this line" } };
+			{ "PC", "os.tmpname", "os.tmpname()", "file" }
+			};
 
 	public StaticLuaCompletions(CompletionProvider provider) {
 		this.provider = provider;

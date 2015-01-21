@@ -30,15 +30,8 @@ import java.util.List;
 
 import org.fife.ui.autocomplete.Completion;
 import org.fife.ui.autocomplete.FunctionCompletion;
-import org.fife.ui.autocomplete.VariableCompletion;
 import org.fife.ui.autocomplete.ParameterizedCompletion.Parameter;
-
-import edu.gcsc.lua.CompletionInfo;
-import edu.gcsc.lua.Completions;
-import edu.gcsc.lua.FunctionParameter;
-import edu.gcsc.lua.IconLib;
-import edu.gcsc.lua.Logging;
-import edu.gcsc.lua.LuaSyntaxInfo;
+import org.fife.ui.autocomplete.VariableCompletion;
 
 public class FifeCompletions implements Completions {
 

@@ -3,12 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.gcsc.vrl.langsupport.lua;
-
-import edu.gcsc.lua.LuaCompletionProvider;
-import edu.gcsc.lua.LuaFoldParser;
-import eu.mihosoft.vrl.lang.visual.EditorConfiguration;
-import eu.mihosoft.vrl.reflection.VisualCanvas;
+package edu.gcsc.vrl.langsupport.ug4lua;
 
 import java.awt.event.KeyEvent;
 
@@ -20,18 +15,22 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
 
+import edu.gcsc.lua.LuaFoldParser;
+import eu.mihosoft.vrl.lang.visual.EditorConfiguration;
+import eu.mihosoft.vrl.reflection.VisualCanvas;
+
 /**
  *
  * @author Michael Hoffer &lt;info@michaelhoffer.de&gt;
  */
-class LuaEditorConfiguration implements EditorConfiguration {
+class UG4LuaEditorConfiguration implements EditorConfiguration {
 
-	LuaCompletionProvider prov;
-	AutoCompletion ac;
-	
+	private UG4LuaAutoCompletionProvider prov;
+	private AutoCompletion ac;
+
 	@Override
 	public void init(VisualCanvas vc) {
-		prov = new LuaCompletionProvider();
+		prov = new UG4LuaAutoCompletionProvider();
 		ac = new AutoCompletion(prov);
 	}
 
@@ -55,7 +54,7 @@ class LuaEditorConfiguration implements EditorConfiguration {
 
 	@Override
 	public String getLanguage() {
-		return "lua";
+		return "ug4lua";
 	}
 
 }

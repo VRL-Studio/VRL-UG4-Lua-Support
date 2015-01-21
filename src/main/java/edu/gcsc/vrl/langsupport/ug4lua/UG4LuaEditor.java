@@ -58,6 +58,9 @@ import edu.gcsc.lua.LuaFoldParser;
 import edu.gcsc.vrl.StateFile;
 import edu.gcsc.vrl.lua.autocompletion.UG4EditorProfile;
 
+/**
+ * Stand-alone UG4/LUA-editor For testing purposes.
+ */
 public class UG4LuaEditor implements ActionListener {
 
 	JMenuItem open, save, ug4CompletionTxt, ug4Root;

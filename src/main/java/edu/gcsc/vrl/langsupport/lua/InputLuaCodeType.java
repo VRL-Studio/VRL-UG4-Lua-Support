@@ -52,26 +52,21 @@
 
 package edu.gcsc.vrl.langsupport.lua;
 
+import java.awt.Dimension;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+
 import eu.mihosoft.vrl.annotation.TypeInfo;
-import eu.mihosoft.vrl.lang.CompilerProvider;
 import eu.mihosoft.vrl.lang.VLangUtils;
 import eu.mihosoft.vrl.lang.visual.EditorProvider;
-import eu.mihosoft.vrl.reflection.RepresentationType;
 import eu.mihosoft.vrl.reflection.TypeRepresentationBase;
 import eu.mihosoft.vrl.visual.ResizableContainer;
 import eu.mihosoft.vrl.visual.VBoxLayout;
 import eu.mihosoft.vrl.visual.VCodeEditor;
 import eu.mihosoft.vrl.visual.VContainer;
-import eu.mihosoft.vrl.visual.VScrollPane;
 import groovy.lang.Script;
-import java.awt.Dimension;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseMotionListener;
-import javax.swing.BoxLayout;
 
 /**
  * TypeRepresentation for

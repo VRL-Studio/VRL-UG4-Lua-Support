@@ -4,7 +4,6 @@
  */
 package edu.gcsc.vrl.langsupport.lua;
 
-import edu.gcsc.vrl.langsupport.ug4lua.InputUG4LuaCodeType;
 import eu.mihosoft.vrl.system.InitPluginAPI;
 import eu.mihosoft.vrl.system.PluginAPI;
 import eu.mihosoft.vrl.system.PluginIdentifier;
@@ -16,6 +15,7 @@ import eu.mihosoft.vrl.system.VPluginConfigurator;
 /**
  *
  * @author Michael Hoffer <info@michaelhoffer.de>
+ *
  */
 public class LuaPluginConfigurator extends VPluginConfigurator{
 
@@ -30,12 +30,12 @@ public class LuaPluginConfigurator extends VPluginConfigurator{
        // exportPackage("com.your.package");
 
        // describe the plugin
-       setDescription("Plugin Description");
+       setDescription("Generic code-completion support for LUA scripts");
 
        // copyright info
-       setCopyrightInfo("Sample-Plugin",
-               "(c) Your Name",
-               "www.you.com", "License Name", "License Text...");
+       setCopyrightInfo("VRL-Lua-Support",
+               "(c) Goethe Center for Scientific Computing. Goethe University Frankfurt.",
+               "http://gcsc.uni-frankfurt.de", "BSD-2-Clause", "http://opensource.org/licenses/BSD-2-Clause");
 
        // specify dependencies
        // addDependency(new PluginDependency("VRL", "0.4.0", "0.4.0"));
