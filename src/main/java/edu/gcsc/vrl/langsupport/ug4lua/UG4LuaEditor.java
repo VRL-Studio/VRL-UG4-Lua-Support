@@ -53,8 +53,12 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
 import org.fife.ui.rtextarea.RTextScrollPane;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.JsePlatform;
 
 import edu.gcsc.lua.LuaFoldParser;
+import edu.gcsc.lua.LuaErrorParser;
 import edu.gcsc.vrl.StateFile;
 import edu.gcsc.vrl.lua.autocompletion.UG4EditorProfile;
 
@@ -63,7 +67,7 @@ import edu.gcsc.vrl.lua.autocompletion.UG4EditorProfile;
  */
 public class UG4LuaEditor implements ActionListener {
 
-	JMenuItem open, save, ug4CompletionTxt, ug4Root;
+	JMenuItem open, save, run, ug4CompletionTxt, ug4Root;
 	JFrame frame;
 	JFileChooser fileChooser;
 	RSyntaxTextArea textArea;
@@ -91,13 +95,13 @@ public class UG4LuaEditor implements ActionListener {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Display the window.
-
 		FoldParserManager.get().addFoldParserMapping(
 				SyntaxConstants.SYNTAX_STYLE_LUA, new LuaFoldParser());
 		textArea = new RSyntaxTextArea(40, 80);
 		textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_LUA);
 		textArea.setCodeFoldingEnabled(true);
 		textArea.setAntiAliasingEnabled(true);
+		textArea.addParser(new LuaErrorParser());
 
 		prov = new UG4LuaAutoCompletionProvider();
 		try {
@@ -128,15 +132,19 @@ public class UG4LuaEditor implements ActionListener {
 		menuBar.add(menu);
 		open = new JMenuItem("Open...");
 		save = new JMenuItem("Save");
+		run = new JMenuItem("Run");
 		ug4CompletionTxt = new JMenuItem("Set ugCompletion.txt");
 		ug4Root = new JMenuItem("Set UG root folder");
 		menu.add(open);
 		menu.add(save);
 		menu.addSeparator();
+		menu.add(run);
+		menu.addSeparator();
 		menu.add(ug4CompletionTxt);
 		menu.add(ug4Root);
 		open.addActionListener(this);
 		save.addActionListener(this);
+		run.addActionListener(this);
 		ug4CompletionTxt.addActionListener(this);
 		ug4Root.addActionListener(this);
 		frame.add(menuBar, BorderLayout.NORTH);
@@ -226,6 +234,10 @@ public class UG4LuaEditor implements ActionListener {
 
 			}
 		}
+		if (src == run)
+		{
+			run();
+		}
 	}
 
 	void load(File file) {
@@ -264,5 +276,11 @@ public class UG4LuaEditor implements ActionListener {
 					"Could not save file.\n" + e.getMessage());
 			e.printStackTrace();
 		}
+	}
+	
+	void run()
+	{
+		LuaValue v = JsePlatform.standardGlobals().load(textArea.getText());
+		v.call(textArea.getText());
 	}
 }
