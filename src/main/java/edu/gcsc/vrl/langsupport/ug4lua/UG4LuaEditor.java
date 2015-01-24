@@ -34,8 +34,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -45,7 +48,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 import org.fife.ui.autocomplete.AutoCompletion;
 import org.fife.ui.autocomplete.CompletionCellRenderer;
@@ -54,6 +61,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
@@ -69,6 +77,7 @@ public class UG4LuaEditor implements ActionListener {
 
 	JMenuItem open, save, run, ug4CompletionTxt, ug4Root;
 	JFrame frame;
+	JTextArea console;
 	JFileChooser fileChooser;
 	RSyntaxTextArea textArea;
 	RTextScrollPane pane;
@@ -147,9 +156,11 @@ public class UG4LuaEditor implements ActionListener {
 		run.addActionListener(this);
 		ug4CompletionTxt.addActionListener(this);
 		ug4Root.addActionListener(this);
-		frame.add(menuBar, BorderLayout.NORTH);
 
+		console = new JTextArea(12, 80);
+		frame.add(menuBar, BorderLayout.NORTH);
 		frame.add(pane, BorderLayout.CENTER);
+		frame.add(new JScrollPane(console), BorderLayout.SOUTH);
 		frame.pack();
 		frame.setVisible(true);
 
@@ -234,8 +245,8 @@ public class UG4LuaEditor implements ActionListener {
 
 			}
 		}
-		if (src == run)
-		{
+		if (src == run) {
+			console.setText("Running script...");
 			run();
 		}
 	}
@@ -277,10 +288,36 @@ public class UG4LuaEditor implements ActionListener {
 			e.printStackTrace();
 		}
 	}
-	
-	void run()
-	{
-		LuaValue v = JsePlatform.standardGlobals().load(textArea.getText());
-		v.call(textArea.getText());
+
+	void run() {
+		Globals globals = JsePlatform.standardGlobals();
+		globals.STDOUT = new PrintStream(new OutputStream() {
+
+			StringBuffer buf = new StringBuffer();
+
+			@Override
+			public void write(int b) throws IOException {
+				buf.append((char) b);
+				if ('\n' == (char) b) {
+					Document doc = console.getDocument();
+					try {
+						doc.insertString(doc.getEndPosition().getOffset(),
+								buf.toString(), null);
+						console.setCaretPosition(doc.getEndPosition().getOffset()-1);
+					} catch (BadLocationException e) {
+						// should not happen, hehe
+					}
+					buf.setLength(0);
+				}
+			}
+		});
+		globals.STDERR = globals.STDOUT;
+		try {
+			LuaValue v = globals.load(textArea.getText());
+			v.call(textArea.getText());
+		} catch (LuaError err) {
+			globals.STDOUT.println("Error occured during script execution:\n" + err.getMessage());
+		}
+		globals.STDOUT.println("\nFinished script.\n");
 	}
 }
