@@ -19,8 +19,8 @@ repositories {
     }
     
     maven {
-        name 'turpid monkeys' 
-        url 'https://dl.bintray.com/turpid-monkey/maven'
+        name 'JFrog OSS snapshot repo'
+        url  'https://oss.jfrog.org/oss-snapshot-local/'
     }  
 }
 
@@ -32,8 +32,8 @@ dependencies {
     compile (group: 'eu.mihosoft.vrl', name: 'vrl', version: '0.4.2.8.6-SNAPSHOT', classifier: 'sources')
     compile (group: 'eu.mihosoft.vrl', name: 'vrl', version: '0.4.2.8.6-SNAPSHOT', classifier: 'javadoc')
     
-    compile (group: 'edu.gcsc.lua', name: 'luaautocomplete', version: '0.1')
-    compile (group: 'edu.gcsc.uglua', name: 'ug4luaautocomplete', version: '0.1')
+    compile (group: 'edu.gcsc.lua', name: 'luaautocomplete', version: '0.2-SNAPSHOT')
+    compile (group: 'edu.gcsc.lua', name: 'ug4luaautocomplete', version: '0.2-SNAPSHOT')
     
     
     compile (group: 'org.luaj', name: 'luaj-jse', version: '3.0')

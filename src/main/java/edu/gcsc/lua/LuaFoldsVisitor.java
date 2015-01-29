@@ -33,10 +33,8 @@ import javax.swing.text.BadLocationException;
 import org.fife.ui.rsyntaxtextarea.folding.Fold;
 import org.fife.ui.rsyntaxtextarea.folding.FoldType;
 
-import edu.gcsc.lua.Logging;
-
-import org.mism.forfife.lua.LuaBaseVisitor;
-import org.mism.forfife.lua.LuaParser.BlockContext;
+import edu.gcsc.lua.grammar.LuaBaseVisitor;
+import edu.gcsc.lua.grammar.LuaParser.BlockContext;
 
 class LuaFoldsVisitor extends LuaBaseVisitor<Void> {
 	private final List<Fold> folds = new ArrayList<Fold>();

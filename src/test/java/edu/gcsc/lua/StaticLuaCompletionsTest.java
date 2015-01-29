@@ -64,6 +64,6 @@ public class StaticLuaCompletionsTest {
 		StaticLuaCompletions comps = new StaticLuaCompletions(null);
 		List<Completion> completions = new ArrayList<Completion>();
 		comps.addCompletions(completions, new LuaCompletionProvider(), comps.completionsTable);
-		assertEquals(74, completions.size());
+		assertEquals(72, completions.size());
 	}
 }
