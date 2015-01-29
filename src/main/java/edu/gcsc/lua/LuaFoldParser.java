@@ -37,8 +37,10 @@ import org.antlr.v4.runtime.Lexer;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.folding.Fold;
 import org.fife.ui.rsyntaxtextarea.folding.FoldParser;
+import org.fife.ui.rsyntaxtextarea.folding.FoldType;
 
 import edu.gcsc.lua.Logging;
+import edu.gcsc.lua.LuaFoldsVisitor.FoldProposal;
 import edu.gcsc.lua.grammar.LuaLexer;
 import edu.gcsc.lua.grammar.LuaParser;
 
@@ -81,10 +83,21 @@ public class LuaFoldParser implements FoldParser {
 			Lexer lx = new LuaLexer(str);
 			CommonTokenStream tokStr = new CommonTokenStream(lx);
 			LuaParser parser = new LuaParser(tokStr);
-			LuaFoldsVisitor lfv = new LuaFoldsVisitor(textArea);
+			LuaFoldsVisitor lfv = new LuaFoldsVisitor();
 			lfv.visit(parser.chunk());
 			Logging.debug("Found " + lfv.getFolds().size() + " folds.");
-			return lfv.getFolds();
+
+			List<Fold> folds = new ArrayList<Fold>();
+			for (FoldProposal prop : lfv.getFolds()) {
+				int offset = textArea.getLineStartOffset(prop.getStartLine())
+						+ prop.getStartChar();
+				Fold f = textArea.createFold(FoldType.CODE, offset);
+				int endOffset = textArea.getLineStartOffset(prop.getEndLine())
+						+ prop.getEndChar();
+				f.setEndOffset(endOffset);
+				folds.add(f);
+			}
+			return folds;
 		} catch (Exception e) {
 			Logging.error("No folds found due to exception", e);
 			return new ArrayList<Fold>();

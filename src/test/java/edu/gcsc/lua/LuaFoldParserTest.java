@@ -61,7 +61,7 @@ public class LuaFoldParserTest {
 						+ "function demo()\n" + "  test = 5\n"
 						+ "  return test\n" + "end\n");
 
-		expect(mock.getLineStartOffset(0)).andReturn(0).times(2);
+		expect(mock.getLineStartOffset(0)).andReturn(0);
 		expect(mock.getLineStartOffset(3)).andReturn(12);
 		expect(mock.getLineStartOffset(4)).andReturn(12);
 		expect(mock.getLineStartOffset(7)).andReturn(12);

@@ -28,45 +28,51 @@ package edu.gcsc.lua;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.text.BadLocationException;
-
-import org.fife.ui.rsyntaxtextarea.folding.Fold;
-import org.fife.ui.rsyntaxtextarea.folding.FoldType;
-
 import edu.gcsc.lua.grammar.LuaBaseVisitor;
+import edu.gcsc.lua.grammar.LuaParser;
 import edu.gcsc.lua.grammar.LuaParser.BlockContext;
 
 class LuaFoldsVisitor extends LuaBaseVisitor<Void> {
-	private final List<Fold> folds = new ArrayList<Fold>();
-	private final TextField textArea;
+	private final List<FoldProposal> folds = new ArrayList<FoldProposal>();
 
-	public LuaFoldsVisitor(TextField textArea) {
-		this.textArea = textArea;
+	public static class FoldProposal {
+		private int startLine, endLine, startChar, endChar;
+
+		public int getEndChar() {
+			return endChar;
+		}
+
+		public int getEndLine() {
+			return endLine;
+		}
+
+		public int getStartChar() {
+			return startChar;
+		}
+
+		public int getStartLine() {
+			return startLine;
+		}
 	}
 
-	public List<Fold> getFolds() {
+	public List<FoldProposal> getFolds() {
 		return folds;
 	}
 
 	@Override
 	public Void visitBlock(BlockContext ctx) {
-		int offset;
-		try {
-			offset = textArea.getLineStartOffset(ctx.getParent().getStart()
-					.getLine() - 1)
-					+ ctx.getParent().getStart().getCharPositionInLine();
-			if (offset != 0 && ctx.getParent() != null
-					&& ctx.getParent().getStop() != null) {
-				int endOffset = textArea.getLineStartOffset(ctx.getParent()
-						.getStop().getLine() - 1)
-						+ ctx.getParent().getStop().getCharPositionInLine();
-				Fold f = textArea.createFold(FoldType.CODE, offset);
-				f.setEndOffset(endOffset);
-				folds.add(f);
-			}
-		} catch (BadLocationException e) {
-			Logging.error("Bad code, check implementation.", e);
-			throw new RuntimeException(e);
+		if (LuaParseTreeUtil.getParentRuleContext(ctx, LuaParser.RULE_block,
+				BlockContext.class) != null
+				&& ctx.getParent() != null
+				&& ctx.getParent().getStart() != null
+				&& ctx.getParent().getStop() != null) {
+			FoldProposal fold = new FoldProposal();
+			fold.startLine = ctx.getParent().getStart().getLine() - 1;
+			fold.startChar = ctx.getParent().getStart().getCharPositionInLine();
+
+			fold.endLine = ctx.getParent().getStop().getLine() - 1;
+			fold.endChar = ctx.getParent().getStop().getCharPositionInLine();
+			folds.add(fold);
 		}
 		return super.visitBlock(ctx);
 	}
