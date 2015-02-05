@@ -1,0 +1,14 @@
+language: java
+jdk:
+- oraclejdk8
+install:
+- ./gradlew --refresh-dependencies --stacktrace
+script:
+- ./gradlew build artifactoryPublish
+after_success:
+- ./gradlew jacocoTestReport coveralls
+after_failure:
+- cat ./build/test-results/*.xml
+env:
+  global:
+    secure: gx0I72CY5SCZMZWsnUXSxQN9ahvD1Z+HJB0xReHoqvMtfqAU+pC8CHuWBxgLpQvzbvHo7zmtAtkoUbX3ZAyfeyBhHXRvJiw8KDXD5CtsREjoVB4cmrwmO8sEAnzX5mPOc5cj4zU+sYmAnJ/nsLMsTI/emdtHSgnBtogRjcHghe0=

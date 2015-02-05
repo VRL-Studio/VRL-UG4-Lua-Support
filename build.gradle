@@ -1,5 +1,21 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'eclipse'
+apply plugin: 'com.jfrog.artifactory'
+
+version = '0.2-SNAPSHOT'
+group = 'edu.gcsc.lua'
+
+if (System.env['TRAVIS'] != null) {
+    project.ext.set ("buildInfo.build.number", System.env.TRAVIS_BUILD_NUMBER)
+    project.ext.set ("buildInfo.build.name", rootProject.name)
+} else {
+    project.ext.set ("buildInfo.build.number", '0' )
+    project.ext.set ("buildInfo.build.name", rootProject.name+"-local")
+}
 
 sourceCompatibility = '1.6'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -17,11 +33,30 @@ repositories {
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
-    
+ 
     maven {
         name 'JFrog OSS snapshot repo'
         url  'https://oss.jfrog.org/oss-snapshot-local/'
     }  
+}
+
+buildscript {
+    repositories {
+    	maven {
+            url 'http://oss.jfrog.org/artifactory/plugins-release'    
+        }
+        maven {
+            name 'jcenter'
+            url  'http://jcenter.bintray.com'
+        }
+    }
+
+    dependencies {
+        classpath 'me.champeau.gradle:antlr4-gradle-plugin:0.1'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '3.0.1')
+    }
 }
 
 dependencies {
@@ -54,6 +89,36 @@ def loadProperties(String sourceFileName) {
     }
 }
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            jar
+        }
+    }
+}
+
+artifactory {
+    contextUrl = "http://oss.jfrog.org/artifactory" 
+    publish {
+        repository {
+            repoKey = 'oss-snapshot-local'
+            username = "turpid-monkey"
+            password = System.getenv()['bintrayKey']
+            maven = true
+        }
+        defaults {
+            publications ('mavenJava')
+        }
+    }
+    resolve {
+        repository {
+            repoKey = 'libs-release'
+            maven = true           
+        }
+    }
+}
+
 // create a fat-jar (class files plus dependencies
 // excludes VRL.jar (plugin jar files must not start with 'vrl-\\d+')
 jar {
@@ -72,7 +137,7 @@ loadProperties('build.properties')
 
 // compiles and installs the vrl plugin to the specified folder
 task installVRLPlugin(dependsOn: [clean,jar]) << {
-    println(">> copying vrl plugin to: " + vrldir+"/plugin-updates")
+    println(">> copying vrl plugin to: " + System.getenv()['HOME'] + "/" + vrldir+ "/plugin-updates")
     copy {
         from buildDir.getPath()+"/libs/"+rootProject.name + ".jar"
         into vrldir+"/plugin-updates"
