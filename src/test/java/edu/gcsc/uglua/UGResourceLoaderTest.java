@@ -22,8 +22,8 @@ public class UGResourceLoaderTest {
 		scripts.deleteOnExit();
 
 		UGResourceLoader.setUg4Root(System.getProperty("java.io.tmpdir"));
-		assertEquals(System.getProperty("java.io.tmpdir"), UGResourceLoader
-				.getUg4Root().getAbsolutePath() + "/");
+		assertTrue(System.getProperty("java.io.tmpdir").startsWith(UGResourceLoader
+				.getUg4Root().getAbsolutePath()));
 		scripts.delete();
 	}
 
