@@ -94,6 +94,14 @@ public class UGResourceLoaderTest {
 		scripts.delete();
 		assertEquals(1, files.size());
 		assertEquals("temp.lua", files.get(0).getName());
+		
+	}
+	
+	@Test public void emptySearch()
+	{
+
+		List<File> files = UGResourceLoader.search(null);
+		assertEquals(0, files.size());
 	}
 
 	@Test

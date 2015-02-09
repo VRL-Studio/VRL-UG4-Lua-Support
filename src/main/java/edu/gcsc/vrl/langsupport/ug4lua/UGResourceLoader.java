@@ -83,7 +83,7 @@ public class UGResourceLoader implements LuaResourceLoader {
 
 	public static List<String> createUGLoadScriptCompletions() {
 		List<String> comps = new ArrayList<String>();
-
+		if (ug4RootScripts==null || currentDir==null) return comps;
 		LuaFilenameFilter lff = new LuaFilenameFilter();
 		List<File> files = search(lff, ug4RootScripts, currentDir);
 
@@ -114,6 +114,9 @@ public class UGResourceLoader implements LuaResourceLoader {
 	 * @return a list of matching files
 	 */
 	public static List<File> search(final FilenameFilter ff, final File... dirs) {
+		final List<File> found = new LinkedList<File>();
+		if (dirs == null || dirs.length == 0)
+			return found;
 		final List<File[]> work = new LinkedList<File[]>();
 		for (File dir : dirs) {
 			if (!dir.isDirectory()) {
@@ -124,7 +127,6 @@ public class UGResourceLoader implements LuaResourceLoader {
 			}
 		}
 		work.add(dirs);
-		final List<File> found = new LinkedList<File>();
 		while (!work.isEmpty()) {
 			File[] flist = work.remove(0);
 			for (File f : flist) {
