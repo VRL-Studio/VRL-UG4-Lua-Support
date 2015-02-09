@@ -28,6 +28,7 @@ package edu.gcsc.lua;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.fife.ui.autocomplete.BasicCompletion;
 import org.fife.ui.autocomplete.Completion;
 import org.fife.ui.autocomplete.FunctionCompletion;
 import org.fife.ui.autocomplete.ParameterizedCompletion.Parameter;
@@ -41,7 +42,7 @@ public class FifeCompletions implements Completions {
 	public FifeCompletions(LuaCompletionProvider provider) {
 		this.provider = provider;
 	}
-	
+
 	public List<Completion> getCompletions() {
 		return completions;
 	}
@@ -55,28 +56,47 @@ public class FifeCompletions implements Completions {
 		case VARIABLE:
 			addVariableCompletion(info, syntaxInfo);
 			break;
+		case LANGUAGE:
+			addKeyWordCompletion(info, syntaxInfo);
+			break;
 		default:
 			throw new IllegalArgumentException("Completion not supported.");
 
 		}
 	}
 
+	protected void addKeyWordCompletion(CompletionInfo info,
+			LuaSyntaxInfo syntaxInfo) {
+		BasicCompletion bc = new BasicCompletion(provider, info.getText(),
+				info.getDescr());
+		if (info.getRelevance() != 0) {
+			bc.setRelevance(100);
+		} else {
+			bc.setRelevance(info.getRelevance());
+		}
+		completions.add(bc);
+	}
+
 	protected void addFunctionCompletion(CompletionInfo info,
 			LuaSyntaxInfo syntaxInfo) {
 		FunctionCompletion fc = new FunctionCompletion(provider,
 				info.getText(), "function");
-		fc.setRelevance(4000);
+		if (info.getRelevance() != 0) {
+			fc.setRelevance(info.getRelevance());
+		} else {
+			fc.setRelevance(4000);
+		}
 		List<FunctionParameter> fparams = syntaxInfo.getFunctionParams(info
 				.getText());
 		List<Parameter> params = new ArrayList<Parameter>();
-		if (fparams != null)
-		{
-		for (FunctionParameter parm : fparams) {
-			params.add(new Parameter(null, parm.getParamName()));
-		}
-		fc.setParams(params);
+		if (fparams != null) {
+			for (FunctionParameter parm : fparams) {
+				params.add(new Parameter(null, parm.getParamName()));
+			}
+			fc.setParams(params);
 		} else {
-			Logging.debug("No parameter info found for function '" + info.getText() + "'");
+			Logging.debug("No parameter info found for function '"
+					+ info.getText() + "'");
 		}
 
 		StringBuffer shortDescr = new StringBuffer();
@@ -93,7 +113,7 @@ public class FifeCompletions implements Completions {
 		}
 
 		fc.setShortDescription(shortDescr.toString());
-		//TODO fc.setIcon(IconLib.instance().getFunctionIcon());
+		// TODO fc.setIcon(IconLib.instance().getFunctionIcon());
 		completions.add(fc);
 
 	}
@@ -106,7 +126,11 @@ public class FifeCompletions implements Completions {
 		}
 		VariableCompletion varCompl = new VariableCompletion(provider,
 				info.getText(), "variable");
-		varCompl.setRelevance(9000);
+		if (info.getRelevance() != 0) {
+			varCompl.setRelevance(info.getRelevance());
+		} else {
+			varCompl.setRelevance(9000);
+		}
 		StringBuffer summary = new StringBuffer();
 		if (info.getResource() != null
 				&& !info.getResource().getResourceLink().startsWith("textArea")) {
@@ -117,7 +141,7 @@ public class FifeCompletions implements Completions {
 			summary.append("<p>from line " + info.getLine());
 		}
 		varCompl.setShortDescription(summary.toString());
-		//TODO varCompl.setIcon(IconLib.instance().getVariableIcon());
+		// TODO varCompl.setIcon(IconLib.instance().getVariableIcon());
 		completions.add(varCompl);
 	}
 

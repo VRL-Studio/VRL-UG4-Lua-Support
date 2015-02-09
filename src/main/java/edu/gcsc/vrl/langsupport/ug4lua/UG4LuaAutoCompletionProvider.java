@@ -30,17 +30,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.text.JTextComponent;
+
 import org.fife.ui.autocomplete.BasicCompletion;
 import org.fife.ui.autocomplete.Completion;
 import org.fife.ui.autocomplete.FunctionCompletion;
 
 import edu.gcsc.lua.CaretInfo;
+import edu.gcsc.lua.CompletionInfo;
+import edu.gcsc.lua.Completions;
 import edu.gcsc.lua.IconLib;
 import edu.gcsc.lua.LuaCompletionProvider;
 import edu.gcsc.lua.LuaResource;
 import edu.gcsc.lua.LuaResourceLoader;
+import edu.gcsc.lua.LuaResourceLoaderFactory;
 import edu.gcsc.lua.LuaSyntaxAnalyzer;
 import edu.gcsc.lua.LuaSyntaxInfo;
+import edu.gcsc.lua.resources.FileResourceLoader;
 import edu.gcsc.lua.visitors.LuaCompletionVisitor;
 import edu.gcsc.vrl.lua.autocompletion.RegClassDescription;
 import edu.gcsc.vrl.lua.autocompletion.RegFunctionDescription;
@@ -50,7 +56,8 @@ import edu.gcsc.vrl.lua.autocompletion.UGLoadScriptVisitor;
 public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 
 	UG4CompletionsLoader ug4loader = new UG4CompletionsLoader();
-	List<Completion> staticCompletions = new ArrayList<Completion>();
+	List<CompletionInfo> staticCompletions = new ArrayList<CompletionInfo>();
+	LuaSyntaxInfo staticSyntaxInfo = new LuaSyntaxInfo();
 
 	public void setUg4Root(String ug4Root) {
 		UGResourceLoader.setUg4Root(ug4Root);
@@ -65,18 +72,25 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 		try {
 			System.out.println("Loading UG4 completions file: " + file);
 			ug4loader.load(new FileInputStream(file));
+			LuaResource res = new LuaResource("file:" + file);
+			staticSyntaxInfo.setResourceLoaderFactory(new LuaResourceLoaderFactory(FileResourceLoader.class));
+			staticSyntaxInfo.setResource(res);
 			for (RegFunctionDescription fd : ug4loader.getFunctions()) {
-				FunctionCompletion fc = new FunctionCompletion(this,
-						fd.getName(), fd.getReturntype());
-				fc.setShortDescription(fd.getHtml());
-				// fc.setShortDescription(fd.getSignature());
-				fc.setRelevance(2000);
-				// TODO fc.setIcon(IconLib.instance().getLibraryIcon());
-				staticCompletions.add(fc);
+				CompletionInfo info = CompletionInfo.newFunctionInstance(res,
+						fd.getName(), fd.getHtml(), fd.getLine(), 0, false);
+				info.setRelevance(3000);
+				staticCompletions.add(info);
+			}
+			for (RegClassDescription cls : ug4loader.getClasses().values()) {
+				CompletionInfo info = CompletionInfo.newKeyWordInstance(
+						cls.getName(), cls.getHtml());
+				info.setRelevance(100);
+				staticCompletions.add(info);
 			}
 		} catch (Exception e) {
 			System.out.println("Loading UG4 completions file failed: "
 					+ e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -95,20 +109,22 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 
 	@Override
 	protected void fillCompletions(LuaSyntaxAnalyzer root,
-			Map<LuaResource, LuaSyntaxInfo> includes,
-			List<Completion> completions, String alreadyEntered, CaretInfo info) {
-		super.fillCompletions(root, includes, completions, alreadyEntered, info);
-		completions.addAll(staticCompletions);
-		// TODO the following two sets of completions can be added to the static completions list
-		completions.addAll(UGResourceLoader.createUGLoadScriptCompletions(this));
-		for (RegClassDescription cls : ug4loader.getClasses().values())
-		{
-			BasicCompletion bc = new BasicCompletion(this, cls.getName());
-			bc.setSummary(cls.getHtml());
-			bc.setRelevance(100);
-			completions.add(bc);
+			Map<LuaResource, LuaSyntaxInfo> includes, Completions completions,
+			String alreadyEntered, CaretInfo info) {
+		System.out
+				.println("Adding static completions in UG4LuaAutoCompletionProvider:101 -> "
+						+ staticCompletions.size());
+
+		for (CompletionInfo ci : staticCompletions) {
+			completions.addCompletion(ci, staticSyntaxInfo);
 		}
-		
+		// TODO: add to statics
+		for (String prop : UGResourceLoader.createUGLoadScriptCompletions()) {
+			CompletionInfo ci = CompletionInfo.newKeyWordInstance(prop,
+					"Load UG shell library script.");
+			completions.addCompletion(ci, staticSyntaxInfo);
+		}
+
 		for (String var : getTypeMap().keySet()) {
 			if (var.startsWith(alreadyEntered)
 					|| alreadyEntered.startsWith(var)) {
@@ -126,14 +142,15 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 							fds.addAll(parent.getMemberfunctions());
 					}
 					for (RegFunctionDescription fd : fds) {
-						FunctionCompletion fc = new FunctionCompletion(this,
-								var + ":" + fd.getName(), fd.getReturntype());
-						fc.setShortDescription(cd.getName() + ":"
-								+ fd.getSignature());
-						fc.setSummary(fd.getHtml());
-						fc.setRelevance(8000);
-						// TODO: fc.setIcon(IconLib.instance().getMemberFunctionIcon());
-						completions.add(fc);
+						CompletionInfo ci = CompletionInfo.newFunctionInstance(
+								staticSyntaxInfo.getResource(),
+								var + ":" + fd.getName(), fd.getHtml(), 0, 0, false);
+						ci.setRelevance(7000);
+						completions.addCompletion(ci, staticSyntaxInfo);
+						// fc.setShortDescription(cd.getName() + ":"
+						// + fd.getSignature());
+						// TODO:
+						// fc.setIcon(IconLib.instance().getMemberFunctionIcon());
 					}
 				}
 			}

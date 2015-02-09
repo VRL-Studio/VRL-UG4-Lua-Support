@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.fife.ui.autocomplete.BasicCompletion;
 import org.fife.ui.autocomplete.FunctionCompletion;
 import org.fife.ui.autocomplete.VariableCompletion;
 import org.junit.Test;
@@ -40,6 +41,11 @@ public class FifeCompletionsTest {
 				.iterator().next();
 		assertEquals("var", vc.getInputText());
 
+		comps.getCompletions().clear();
+		comps.addCompletion(CompletionInfo.newKeyWordInstance("test", "test"), an);
+
+		BasicCompletion bc = (BasicCompletion) comps.getCompletions().iterator().next();
+		assertEquals("test", bc.getInputText());
 	}
 
 	@Test

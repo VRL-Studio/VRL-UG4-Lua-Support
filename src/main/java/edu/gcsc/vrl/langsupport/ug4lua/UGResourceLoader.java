@@ -81,16 +81,14 @@ public class UGResourceLoader implements LuaResourceLoader {
 
 	}
 
-	public static List<Completion> createUGLoadScriptCompletions(
-			CompletionProvider prov) {
-		List<Completion> comps = new ArrayList<Completion>();
+	public static List<String> createUGLoadScriptCompletions() {
+		List<String> comps = new ArrayList<String>();
 
 		LuaFilenameFilter lff = new LuaFilenameFilter();
 		List<File> files = search(lff, ug4RootScripts, currentDir);
 
 		for (File f : files) {
-			comps.add(new BasicCompletion(prov, "ug_load_script(\""
-					+ getRelativePath(f) + "\")"));
+			comps.add("ug_load_script(\"" + getRelativePath(f) + "\")");
 
 		}
 

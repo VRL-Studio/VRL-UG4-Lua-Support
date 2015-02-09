@@ -112,12 +112,11 @@ public class UGResourceLoaderTest {
 		out.write("test");
 		out.close();
 
-		List<Completion> completions = UGResourceLoader
-				.createUGLoadScriptCompletions(null);
+		List<String> completions = UGResourceLoader
+				.createUGLoadScriptCompletions();
 		temp.delete();
 		scripts.delete();
 		assertEquals(2, completions.size());
-		assertEquals("ug_load_script(\"temp.lua\")", completions.get(0)
-				.getReplacementText());
+		assertEquals("ug_load_script(\"temp.lua\")", completions.get(0));
 	}
 }

@@ -137,10 +137,11 @@ loadProperties('build.properties')
 
 // compiles and installs the vrl plugin to the specified folder
 task installVRLPlugin(dependsOn: [clean,jar]) << {
-    println(">> copying vrl plugin to: " + System.getenv()['HOME'] + "/" + vrldir+ "/plugin-updates")
+    def vrlPluginPath = System.getenv()['HOME'] + "/" + vrldir+ "/plugin-updates"
+    println(">> copying vrl plugin to: " + vrlPluginPath)
     copy {
-        from buildDir.getPath()+"/libs/"+rootProject.name + ".jar"
-        into vrldir+"/plugin-updates"
+        from buildDir.getPath()+"/libs/"+rootProject.name + "-" + rootProject.version + ".jar"
+        into vrlPluginPath
         include '**/*.jar'
     }
 }

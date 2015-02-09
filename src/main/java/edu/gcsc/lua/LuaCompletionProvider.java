@@ -94,8 +94,9 @@ public class LuaCompletionProvider extends DefaultCompletionProvider {
 		List<Completion> completions = new ArrayList<Completion>();
 		LuaCompletionsBuilder builder = new LuaCompletionsBuilder();
 		FifeCompletions fifes = new FifeCompletions(this);
-		builder.fillCompletions(analyzer, cache, fifes, alreadyEntered, getCaretInfoFor((RSyntaxTextArea) comp));
-		
+		CaretInfo info = getCaretInfoFor((RSyntaxTextArea) comp);
+		builder.fillCompletions(analyzer, cache, fifes, alreadyEntered, info);
+		fillCompletions(analyzer, cache, fifes, alreadyEntered, info);
 		super.clear();
 		
 		Logging.debug("Created " + completions.size() + " completions.");
@@ -110,12 +111,11 @@ public class LuaCompletionProvider extends DefaultCompletionProvider {
 		
 		return super.getCompletionsImpl(comp);
 	}
-
+	
 	protected void fillCompletions(LuaSyntaxAnalyzer analyzer,
 			Map<LuaResource, LuaSyntaxInfo> includes,
-			List<Completion> completions, String alreadyEntered, CaretInfo info) {
-		analyzer.initCompletions(info, includes);
-		
+			Completions completions, String alreadyEntered, CaretInfo info) {
+		// hook for sub-classes	
 	}
 
 	protected void fillVisitors(List<LuaCompletionVisitor> visitors) {
