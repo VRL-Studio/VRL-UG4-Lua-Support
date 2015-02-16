@@ -4,6 +4,9 @@
  */
 package edu.gcsc.vrl.langsupport.ug4lua;
 
+import edu.gcsc.lua.Logging;
+import edu.gcsc.lua.TextAreaManager;
+import edu.gcsc.lua.resources.JTextComponentResourceLoader;
 import eu.mihosoft.vrl.io.ConfigurationFile;
 import eu.mihosoft.vrl.system.InitPluginAPI;
 import eu.mihosoft.vrl.system.PluginAPI;
@@ -17,6 +20,9 @@ import eu.mihosoft.vrl.system.VPluginConfigurator;
  * @author Michael Hoffer <info@michaelhoffer.de>
  */
 public class UG4LuaPluginConfigurator extends VPluginConfigurator {
+	
+
+	UG4LuaAutoCompletionProvider prov = new UG4LuaAutoCompletionProvider();
 
 	public UG4LuaPluginConfigurator() {
 		// specify the plugin name and version
@@ -71,43 +77,49 @@ public class UG4LuaPluginConfigurator extends VPluginConfigurator {
 			// vapi.addComponent(MyComponent.class);
 			// vapi.addTypeRepresentation(MyType.class);
 
-			vapi.addEditorConfiguration(new UG4LuaEditorConfiguration(
-					configuration));
+			vapi.addEditorConfiguration(new UG4LuaEditorConfiguration(prov));
 			vapi.addTypeRepresentation(InputUG4LuaCodeType.class);
 		}
 	}
 
 	@Override
 	public void unregister(PluginAPI api) {
-		// nothing to unregister
+		configuration = null;
 	}
 
 	@Override
 	public void init(final InitPluginAPI iApi) {
 		ConfigurationFile conf = iApi.getConfiguration();
-		final String ugBaseDirProperty = "edu.gcsc.vrl.langsupport.ug4lua.UGBASEDIR";
-		if (!conf.containsProperty(ugBaseDirProperty)) {
-			conf.setProperty(ugBaseDirProperty, "");
-			conf.save();
-		}
-		final String ugCompletionsTxtProperty = "edu.gcsc.vrl.langsupport.ug4lua.UGCOMPLETIONSTXT";
-		if (!conf.containsProperty(ugCompletionsTxtProperty)) {
-			conf.setProperty(ugCompletionsTxtProperty, "");
-			conf.save();
-		}
-		configuration.setUgBaseDir(conf.getProperty(ugBaseDirProperty));
-		configuration.setUgCompletionsTxt(conf
-				.getProperty(ugCompletionsTxtProperty));
-
+	    
+		Logging.debug("start UG4LuaPluginConfigurator.init");
+		configuration.setProvider(prov);
+		configuration.setConfigurationFile(conf);
+		configuration.load();
+		
+		Logging.debug("end UG4LuaPluginConfigurator.init");
 	}
 
-	private UG4LuaPluginConfiguration configuration = new UG4LuaPluginConfiguration();
+	private static UG4LuaPluginConfiguration configuration = new UG4LuaPluginConfiguration();
+
+	public static UG4LuaPluginConfiguration config() {
+		return configuration;
+	}
 
 	public static class UG4LuaPluginConfiguration {
 		String ugBaseDir, ugCompletionsTxt;
 
+		ConfigurationFile conf;
+		UG4LuaAutoCompletionProvider prov;
+
+		final String ugBaseDirProperty = "edu.gcsc.vrl.langsupport.ug4lua.UGBASEDIR";
+		final String ugCompletionsTxtProperty = "edu.gcsc.vrl.langsupport.ug4lua.UGCOMPLETIONSTXT";
+
 		public String getUgBaseDir() {
 			return ugBaseDir;
+		}
+
+		public void setProvider(UG4LuaAutoCompletionProvider prov) {
+			this.prov = prov;
 		}
 
 		public String getUgCompletionsTxt() {
@@ -115,11 +127,54 @@ public class UG4LuaPluginConfigurator extends VPluginConfigurator {
 		}
 
 		public void setUgBaseDir(String ugBaseDir) {
-			this.ugBaseDir = ugBaseDir;
+			try {
+				UGResourceLoader.setUg4Root(ugBaseDir);
+				JTextComponentResourceLoader.getTextAreaManager().free();
+				if (this.ugBaseDir != null) { // should only be null at init
+					conf.setProperty(ugBaseDirProperty, ugBaseDir);
+					conf.save();
+				}
+				this.ugBaseDir = ugBaseDir;
+			} catch (Exception e) {
+				Logging.error("Error setting UG base folder: " + e.getMessage(), e);
+			}
 		}
 
 		public void setUgCompletionsTxt(String ugCompletionsTxt) {
-			this.ugCompletionsTxt = ugCompletionsTxt;
+			try {
+				prov.loadUg4CompletionsTxt(ugCompletionsTxt);
+				if (this.ugCompletionsTxt != null) { // it should only be null
+														// at init
+					conf.setProperty(ugCompletionsTxtProperty, ugCompletionsTxt);
+					conf.save();
+				}
+				this.ugCompletionsTxt = ugCompletionsTxt;
+			} catch (Exception e) {
+				Logging.error("Error loading ugCompletions.txt: "
+						+ e.getMessage(), e);
+			}
+		}
+
+		public void setConfigurationFile(ConfigurationFile conf) {
+			this.conf = conf;
+		}
+
+		public void load() {
+			Logging.debug("Loading configuration from config.xml");
+			if (!conf.containsProperty(ugBaseDirProperty)) {
+				conf.setProperty(ugBaseDirProperty, "");
+				Logging.debug("Adding empty entry for " + ugBaseDirProperty
+						+ " config.xml");
+				conf.save();
+			}
+			if (!conf.containsProperty(ugCompletionsTxtProperty)) {
+				conf.setProperty(ugCompletionsTxtProperty, "");
+				Logging.debug("Adding empty entry for "
+						+ ugCompletionsTxtProperty + " config.xml");
+				conf.save();
+			}
+			setUgBaseDir(conf.getProperty(ugBaseDirProperty));
+			setUgCompletionsTxt(conf.getProperty(ugCompletionsTxtProperty));
 		}
 	}
 }

@@ -67,8 +67,8 @@ public class FifeCompletions implements Completions {
 
 	protected void addKeyWordCompletion(CompletionInfo info,
 			LuaSyntaxInfo syntaxInfo) {
-		BasicCompletion bc = new BasicCompletion(provider, info.getText(),
-				info.getDescr());
+		BasicCompletion bc = new BasicCompletion(provider, info.getText());
+		bc.setSummary(info.getDescr());
 		if (info.getRelevance() != 0) {
 			bc.setRelevance(100);
 		} else {
@@ -86,8 +86,7 @@ public class FifeCompletions implements Completions {
 		} else {
 			fc.setRelevance(4000);
 		}
-		List<FunctionParameter> fparams = syntaxInfo.getFunctionParams(info
-				.getText());
+		List<FunctionParameter> fparams = info.getParameter();
 		List<Parameter> params = new ArrayList<Parameter>();
 		if (fparams != null) {
 			for (FunctionParameter parm : fparams) {
@@ -103,6 +102,9 @@ public class FifeCompletions implements Completions {
 		if (syntaxInfo.getDoxyGenMap().containsKey(info.getText())) {
 			shortDescr.append(syntaxInfo.getDoxyGenMap().get(info.getText()));
 		}
+		if (info.getDescr() != null) {
+			shortDescr.append(info.getDescr());
+		}
 		if (info.getResource() != null
 				&& !info.getResource().getResourceLink().startsWith("textArea")) {
 			shortDescr.append("<p>included from "
@@ -113,7 +115,7 @@ public class FifeCompletions implements Completions {
 		}
 
 		fc.setShortDescription(shortDescr.toString());
-		// TODO fc.setIcon(IconLib.instance().getFunctionIcon());
+		// fc.setIcon(IconLib.instance().getFunctionIcon());
 		completions.add(fc);
 
 	}
@@ -132,6 +134,9 @@ public class FifeCompletions implements Completions {
 			varCompl.setRelevance(9000);
 		}
 		StringBuffer summary = new StringBuffer();
+		if (info.getDescr() != null) {
+			summary.append(info.getDescr());
+		}
 		if (info.getResource() != null
 				&& !info.getResource().getResourceLink().startsWith("textArea")) {
 			summary.append("<p>included from "

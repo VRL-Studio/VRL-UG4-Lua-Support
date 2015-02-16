@@ -58,6 +58,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
+import edu.gcsc.lua.resources.JTextComponentResourceLoader;
 import eu.mihosoft.vrl.annotation.TypeInfo;
 import eu.mihosoft.vrl.lang.VLangUtils;
 import eu.mihosoft.vrl.lang.visual.EditorProvider;
@@ -129,6 +130,12 @@ public class InputLuaCodeType extends TypeRepresentationBase {
     
     protected VCodeEditor createEditor() {
         return EditorProvider.getEditor("lua", this);
+    }
+    
+    @Override
+    public void dispose() {
+    	super.dispose();
+    	JTextComponentResourceLoader.getTextAreaManager().free(editor.getEditor());
     }
 
     @Override

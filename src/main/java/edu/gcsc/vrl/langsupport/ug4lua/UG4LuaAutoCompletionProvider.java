@@ -30,16 +30,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.text.JTextComponent;
-
-import org.fife.ui.autocomplete.BasicCompletion;
-import org.fife.ui.autocomplete.Completion;
-import org.fife.ui.autocomplete.FunctionCompletion;
-
 import edu.gcsc.lua.CaretInfo;
 import edu.gcsc.lua.CompletionInfo;
 import edu.gcsc.lua.Completions;
-import edu.gcsc.lua.IconLib;
+import edu.gcsc.lua.FunctionParameter;
+import edu.gcsc.lua.Logging;
 import edu.gcsc.lua.LuaCompletionProvider;
 import edu.gcsc.lua.LuaResource;
 import edu.gcsc.lua.LuaResourceLoader;
@@ -71,14 +66,26 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 
 		try {
 			System.out.println("Loading UG4 completions file: " + file);
+			staticCompletions.clear();
 			ug4loader.load(new FileInputStream(file));
 			LuaResource res = new LuaResource("file:" + file);
-			staticSyntaxInfo.setResourceLoaderFactory(new LuaResourceLoaderFactory(FileResourceLoader.class));
+			// for now the syntax info wants at least a dummy resource, not
+			// pretty
+			staticSyntaxInfo
+					.setResourceLoaderFactory(new LuaResourceLoaderFactory(
+							FileResourceLoader.class));
 			staticSyntaxInfo.setResource(res);
 			for (RegFunctionDescription fd : ug4loader.getFunctions()) {
 				CompletionInfo info = CompletionInfo.newFunctionInstance(res,
 						fd.getName(), fd.getHtml(), fd.getLine(), 0, false);
 				info.setRelevance(3000);
+				int params = fd.getParameterCount();
+                info.setParameter(
+						new ArrayList<FunctionParameter>());
+				for (int i = 0; i < params; i++) {
+					info.getParameter().add(
+							new FunctionParameter(fd.getParameterName(i)));
+				}
 				staticCompletions.add(info);
 			}
 			for (RegClassDescription cls : ug4loader.getClasses().values()) {
@@ -111,9 +118,8 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 	protected void fillCompletions(LuaSyntaxAnalyzer root,
 			Map<LuaResource, LuaSyntaxInfo> includes, Completions completions,
 			String alreadyEntered, CaretInfo info) {
-		System.out
-				.println("Adding static completions in UG4LuaAutoCompletionProvider:101 -> "
-						+ staticCompletions.size());
+		Logging.debug("Adding static completions in UG4LuaAutoCompletionProvider:101 -> "
+				+ staticCompletions.size());
 
 		for (CompletionInfo ci : staticCompletions) {
 			completions.addCompletion(ci, staticSyntaxInfo);
@@ -144,7 +150,8 @@ public class UG4LuaAutoCompletionProvider extends LuaCompletionProvider {
 					for (RegFunctionDescription fd : fds) {
 						CompletionInfo ci = CompletionInfo.newFunctionInstance(
 								staticSyntaxInfo.getResource(),
-								var + ":" + fd.getName(), fd.getHtml(), 0, 0, false);
+								var + ":" + fd.getName(), fd.getHtml(), 0, 0,
+								false);
 						ci.setRelevance(7000);
 						completions.addCompletion(ci, staticSyntaxInfo);
 						// fc.setShortDescription(cd.getName() + ":"

@@ -44,13 +44,28 @@ import edu.gcsc.lua.grammar.LuaParser.ChunkContext;
 
 public class LuaErrorParser extends AbstractParser {
 
+	private final class LuaErrorNodeVisitor extends LuaBaseVisitor<Void> {
+		private final DefaultParseResult res;
+
+		private LuaErrorNodeVisitor(DefaultParseResult res) {
+			this.res = res;
+		}
+
+		@Override
+		public Void visitErrorNode(ErrorNode node) {
+			res.addNotice(createNotice("Error", node.getSymbol(),
+					DefaultParserNotice.ERROR));
+			return super.visitErrorNode(node);
+		}
+	}
+	
 	@Override
 	public ParseResult parse(RSyntaxDocument doc, String paramString) {
 		BufferedReader reader = new BufferedReader(new DocumentReader(doc));
 		StringBuffer buf = new StringBuffer();
 		String line;
 
-		final DefaultParseResult res = new DefaultParseResult(this);
+		DefaultParseResult res = new DefaultParseResult(this);
 
 		try {
 			while ((line = reader.readLine()) != null) {
@@ -58,14 +73,7 @@ public class LuaErrorParser extends AbstractParser {
 				buf.append("\n");
 			}
 			ChunkContext ctx = LuaParseTreeUtil.parse(buf.toString());
-			new LuaBaseVisitor<Void>() {
-				@Override
-				public Void visitErrorNode(ErrorNode node) {
-					res.addNotice(createNotice("Error", node.getSymbol(),
-							DefaultParserNotice.ERROR));
-					return super.visitErrorNode(node);
-				}
-			}.visit(ctx);
+			new LuaErrorNodeVisitor(res).visit(ctx);
 			reader.close();
 		} catch (RecognitionException e) {
 			res.addNotice(createNotice(e.getMessage(), e.getOffendingToken(),

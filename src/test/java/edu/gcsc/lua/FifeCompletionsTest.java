@@ -19,12 +19,12 @@ public class FifeCompletionsTest {
 	public void testCreateCompletions() {
 		FifeCompletions comps = new FifeCompletions(new LuaCompletionProvider());
 		LuaSyntaxAnalyzer an = new LuaSyntaxAnalyzer();
-		an.getFunctionParams().put("function",
-				Arrays.asList(new FunctionParameter("param1")));
 		an.getDoxyGenMap().put("function", "<p>Some Info");
 
-		comps.addCompletion(CompletionInfo.newFunctionInstance(
-				new LuaResource("test"), "function", 1, 1, true), an);
+		CompletionInfo fi = CompletionInfo.newFunctionInstance(
+				new LuaResource("test"), "function", 1, 1, true);
+		fi.setParameter(Arrays.asList(new FunctionParameter("param1")));
+		comps.addCompletion(fi, an);
 
 		FunctionCompletion fc = (FunctionCompletion) comps.getCompletions()
 				.iterator().next();

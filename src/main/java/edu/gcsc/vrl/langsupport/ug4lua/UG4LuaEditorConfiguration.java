@@ -36,7 +36,6 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
 
 import edu.gcsc.lua.LuaFoldParser;
-import edu.gcsc.vrl.langsupport.ug4lua.UG4LuaPluginConfigurator.UG4LuaPluginConfiguration;
 import eu.mihosoft.vrl.lang.visual.EditorConfiguration;
 import eu.mihosoft.vrl.reflection.VisualCanvas;
 
@@ -47,31 +46,15 @@ import eu.mihosoft.vrl.reflection.VisualCanvas;
 class UG4LuaEditorConfiguration implements EditorConfiguration {
 
 	private UG4LuaAutoCompletionProvider prov;
-	private AutoCompletion ac;
-	private UG4LuaPluginConfiguration configuration;
 
-	public UG4LuaEditorConfiguration(UG4LuaPluginConfiguration configuration) {
-		this.configuration = configuration;
+	public UG4LuaEditorConfiguration(UG4LuaAutoCompletionProvider prov) {
+		this.prov = prov;
 	}
 
 	@Override
 	public void init(VisualCanvas vc) {
-		prov = new UG4LuaAutoCompletionProvider();
-		ac = new AutoCompletion(prov);
-		try {
-			prov.loadUg4CompletionsTxt(configuration.getUgCompletionsTxt());
-		} catch (Exception e) {
-			System.err.println("Error loading ugCompletions.txt: "
-					+ e.getMessage());
-		}
-		try {
-			UGResourceLoader.setUg4Root(configuration.getUgBaseDir());
-		} catch (Exception e) {
-			System.err.println("Error setting UG base folder: "
-					+ e.getMessage());
-		}
-		System.out.println("Initialized UG4 autocompletion provider with "
-				+ prov.staticCompletions.size() + " completions.");
+		FoldParserManager.get().addFoldParserMapping(
+				SyntaxConstants.SYNTAX_STYLE_LUA, new LuaFoldParser());
 	}
 
 	@Override
@@ -80,12 +63,11 @@ class UG4LuaEditorConfiguration implements EditorConfiguration {
 		textArea.setCodeFoldingEnabled(true);
 		textArea.setAntiAliasingEnabled(true);
 
-		FoldParserManager.get().addFoldParserMapping(
-				SyntaxConstants.SYNTAX_STYLE_LUA, new LuaFoldParser());
-
-		ac.setShowDescWindow(true);
+		AutoCompletion ac;
+		ac = new AutoCompletion(prov);
 		ac.install(textArea);
 		ac.setListCellRenderer(new CompletionCellRenderer());
+		ac.setShowDescWindow(true);
 
 		ac.setTriggerKey(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,
 				KeyEvent.CTRL_DOWN_MASK | KeyEvent.ALT_DOWN_MASK));
