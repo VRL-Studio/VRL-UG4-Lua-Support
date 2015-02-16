@@ -68,6 +68,7 @@ class UG4LuaEditorConfiguration implements EditorConfiguration {
 		ac.install(textArea);
 		ac.setListCellRenderer(new CompletionCellRenderer());
 		ac.setShowDescWindow(true);
+		ac.setParameterAssistanceEnabled(true);
 
 		ac.setTriggerKey(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,
 				KeyEvent.CTRL_DOWN_MASK | KeyEvent.ALT_DOWN_MASK));

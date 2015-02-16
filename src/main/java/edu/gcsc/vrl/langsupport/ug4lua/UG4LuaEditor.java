@@ -110,6 +110,7 @@ public class UG4LuaEditor implements ActionListener {
 		textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_LUA);
 		textArea.setCodeFoldingEnabled(true);
 		textArea.setAntiAliasingEnabled(true);
+
 		textArea.addParser(new LuaErrorParser());
 
 		prov = new UG4LuaAutoCompletionProvider();
@@ -132,6 +133,8 @@ public class UG4LuaEditor implements ActionListener {
 		ac.setShowDescWindow(true);
 		ac.install(textArea);
 		ac.setListCellRenderer(new CompletionCellRenderer());
+		ac.setParameterAssistanceEnabled(true);
+
 
 		pane = new RTextScrollPane(textArea);
 		pane.setFoldIndicatorEnabled(true);
