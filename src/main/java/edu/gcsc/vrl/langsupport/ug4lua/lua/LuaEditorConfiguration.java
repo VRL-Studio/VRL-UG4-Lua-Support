@@ -23,7 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package edu.gcsc.vrl.langsupport.lua;
+package edu.gcsc.vrl.langsupport.ug4lua.lua;
 
 import edu.gcsc.lua.LuaCompletionProvider;
 import edu.gcsc.lua.LuaFoldParser;

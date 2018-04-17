@@ -5,16 +5,14 @@
 package edu.gcsc.vrl.langsupport.ug4lua;
 
 import edu.gcsc.lua.Logging;
-import edu.gcsc.lua.TextAreaManager;
 import edu.gcsc.lua.resources.JTextComponentResourceLoader;
-import edu.gcsc.vrl.langsupport.lua.InputLuaCodeType;
-import edu.gcsc.vrl.langsupport.lua.LuaEditor;
-import edu.gcsc.vrl.langsupport.lua.LuaEditorConfiguration;
-import edu.gcsc.vrl.langsupport.lua.LuaInterpreter;
+import edu.gcsc.vrl.langsupport.ug4lua.lua.InputLuaCodeType;
+import edu.gcsc.vrl.langsupport.ug4lua.lua.LuaEditor;
+import edu.gcsc.vrl.langsupport.ug4lua.lua.LuaEditorConfiguration;
+import edu.gcsc.vrl.langsupport.ug4lua.lua.LuaInterpreter;
 import eu.mihosoft.vrl.io.ConfigurationFile;
 import eu.mihosoft.vrl.system.InitPluginAPI;
 import eu.mihosoft.vrl.system.PluginAPI;
-import eu.mihosoft.vrl.system.PluginDependency;
 import eu.mihosoft.vrl.system.PluginIdentifier;
 import eu.mihosoft.vrl.system.VPluginAPI;
 import eu.mihosoft.vrl.system.VPluginConfigurator;
@@ -25,8 +23,6 @@ import eu.mihosoft.vrl.system.VPluginConfigurator;
 public class UG4LuaPluginConfigurator extends VPluginConfigurator {
 
 
-    UG4LuaAutoCompletionProvider prov = new UG4LuaAutoCompletionProvider();
-
     public UG4LuaPluginConfigurator() {
         // specify the plugin name and version
         setIdentifier(new PluginIdentifier("VRL-UG4-Lua-Support", "0.1"));
@@ -35,7 +31,7 @@ public class UG4LuaPluginConfigurator extends VPluginConfigurator {
         // you can specify packages that shall be
         // exported by using the exportPackage() method:
         //
-        exportPackage("edu.gcsc.vrl.langsupport.lua");
+        exportPackage("edu.gcsc.vrl.langsupport.ug4lua.lua");
         exportPackage("edu.gcsc.vrl.langsupport.ug4lua");
 
         // describe the plugin
@@ -84,7 +80,7 @@ public class UG4LuaPluginConfigurator extends VPluginConfigurator {
             vapi.addEditorConfiguration(new LuaEditorConfiguration());
             vapi.addTypeRepresentation(InputLuaCodeType.class);
 
-            vapi.addEditorConfiguration(new UG4LuaEditorConfiguration(prov));
+            vapi.addEditorConfiguration(new UG4LuaEditorConfiguration(new UG4LuaAutoCompletionProvider()));
             vapi.addTypeRepresentation(InputUG4LuaCodeType.class);
 
             vapi.addComponent(LuaEditor.class);
@@ -103,7 +99,7 @@ public class UG4LuaPluginConfigurator extends VPluginConfigurator {
         ConfigurationFile conf = iApi.getConfiguration();
 
         Logging.debug("start UG4LuaPluginConfigurator.init");
-        configuration.setProvider(prov);
+        configuration.setProvider(new UG4LuaAutoCompletionProvider());
         configuration.setConfigurationFile(conf);
         configuration.load();
 

@@ -50,7 +50,7 @@
  * Computing and Visualization in Science, 2011, in press.
  */
 
-package edu.gcsc.vrl.langsupport.lua;
+package edu.gcsc.vrl.langsupport.ug4lua.lua;
 
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;

@@ -16,7 +16,7 @@ public class UG4LuaEditor implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @OutputInfo(style = "silent", name = " ")
-    public String run(@ParamInfo(name=" ", style="lua-code") String code) {
+    public String run(@ParamInfo(name=" ", style="ug4lua-code") String code) {
         return code;
     }
 

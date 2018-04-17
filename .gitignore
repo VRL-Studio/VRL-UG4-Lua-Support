@@ -8,3 +8,4 @@
 /.nb-gradle/
 .idea/
 VRL-Lua-Support.iml
+out/
