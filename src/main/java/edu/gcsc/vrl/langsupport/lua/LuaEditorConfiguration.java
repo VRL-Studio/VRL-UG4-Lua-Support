@@ -44,7 +44,7 @@ import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
  *
  * @author Michael Hoffer &lt;info@michaelhoffer.de&gt;
  */
-class LuaEditorConfiguration implements EditorConfiguration {
+public class LuaEditorConfiguration implements EditorConfiguration {
 
 	LuaCompletionProvider prov;
 	AutoCompletion ac;

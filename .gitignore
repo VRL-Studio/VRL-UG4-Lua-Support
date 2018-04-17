@@ -5,3 +5,6 @@
 /.settings/
 /.classpath
 /.project
+/.nb-gradle/
+.idea/
+VRL-Lua-Support.iml

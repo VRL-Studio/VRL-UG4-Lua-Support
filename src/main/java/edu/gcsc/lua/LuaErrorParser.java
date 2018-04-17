@@ -42,6 +42,7 @@ import org.fife.ui.rsyntaxtextarea.parser.ParserNotice;
 import edu.gcsc.lua.grammar.LuaBaseVisitor;
 import edu.gcsc.lua.grammar.LuaParser.ChunkContext;
 
+
 public class LuaErrorParser extends AbstractParser {
 
 	private final class LuaErrorNodeVisitor extends LuaBaseVisitor<Void> {
@@ -54,7 +55,7 @@ public class LuaErrorParser extends AbstractParser {
 		@Override
 		public Void visitErrorNode(ErrorNode node) {
 			res.addNotice(createNotice("Error", node.getSymbol(),
-					DefaultParserNotice.ERROR));
+					DefaultParserNotice.Level.ERROR));
 			return super.visitErrorNode(node);
 		}
 	}
@@ -77,7 +78,7 @@ public class LuaErrorParser extends AbstractParser {
 			reader.close();
 		} catch (RecognitionException e) {
 			res.addNotice(createNotice(e.getMessage(), e.getOffendingToken(),
-					DefaultParserNotice.ERROR));
+					DefaultParserNotice.Level.ERROR));
 		} catch (IOException e) {
 			
 		}
@@ -85,7 +86,7 @@ public class LuaErrorParser extends AbstractParser {
 		return res;
 	}
 
-	ParserNotice createNotice(String message, Token node, int level) {
+	ParserNotice createNotice(String message, Token node, DefaultParserNotice.Level level) {
 		DefaultParserNotice notice = new DefaultParserNotice(this, message,
 				node.getLine()+1);
 		notice.setLevel(level);
