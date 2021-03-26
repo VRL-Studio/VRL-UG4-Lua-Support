@@ -17,11 +17,12 @@ if (System.env['TRAVIS'] != null) {
     project.ext.set ("buildInfo.build.name", rootProject.name+"-local")
 }
 
-sourceCompatibility = '1.6'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 	
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.2.1'
+wrapper {
+    gradleVersion = '5.1'
 }
 
 repositories {
@@ -62,18 +63,20 @@ buildscript {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.10'
-    testCompile group: 'org.easymock', name: 'easymock', version: '3.3'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'org.easymock', name: 'easymock', version: '3.3'
 
-    compile (group: 'eu.mihosoft.vrl', name: 'vrl', version: '0.4.3.2.3')
+    implementation (group: 'eu.mihosoft.vrl', name: 'vrl', version: '0.4.4+')
 
-    compile (group: 'edu.gcsc.lua', name: 'luaautocomplete', version: '0.2-SNAPSHOT')
-    compile (group: 'edu.gcsc.lua', name: 'ug4luaautocomplete', version: '0.2-SNAPSHOT')
+    implementation "org.antlr:antlr4-runtime:4.5"
+
+    implementation (group: 'edu.gcsc.lua', name: 'luaautocomplete', version: '0.2-SNAPSHOT')
+    implementation (group: 'edu.gcsc.lua', name: 'ug4luaautocomplete', version: '0.2-SNAPSHOT')
     
     
-    compile (group: 'org.luaj', name: 'luaj-jse', version: '3.0')
-    compile (group: 'org.luaj', name: 'luaj-jse', version: '3.0', classifier: 'sources')
-    compile (group: 'org.luaj', name: 'luaj-jse', version: '3.0', classifier: 'javadoc')
+    implementation (group: 'org.luaj', name: 'luaj-jse', version: '3.0')
+    implementation (group: 'org.luaj', name: 'luaj-jse', version: '3.0', classifier: 'sources')
+    implementation (group: 'org.luaj', name: 'luaj-jse', version: '3.0', classifier: 'javadoc')
 }
 
 def loadProperties(String sourceFileName) {
@@ -98,26 +101,26 @@ publishing {
     }
 }
 
-artifactory {
-    contextUrl = "http://oss.jfrog.org/artifactory" 
-    publish {
-        repository {
-            repoKey = 'oss-snapshot-local'
-            username = "turpid-monkey"
-            password = System.getenv()['bintrayKey']
-            maven = true
-        }
-        defaults {
-            publications ('mavenJava')
-        }
-    }
-    resolve {
-        repository {
-            repoKey = 'libs-release'
-            maven = true           
-        }
-    }
-}
+//artifactory {
+//    contextUrl = "http://oss.jfrog.org/artifactory" 
+//    publish {
+//        repository {
+//            repoKey = 'oss-snapshot-local'
+//            username = "turpid-monkey"
+//            password = System.getenv()['bintrayKey']
+//            maven = true
+//        }
+//        defaults {
+//            publications ('mavenJava')
+//        }
+//    }
+//    resolve {
+//        repository {
+//            repoKey = 'libs-release'
+//            maven = true           
+//        }
+//    }
+//}
 
 // create a fat-jar (class files plus dependencies
 // excludes VRL.jar (plugin jar files must not start with 'vrl-\\d+')
@@ -129,19 +132,21 @@ jar {
         files.collect { zipTree(it) }
 
     // project class files compiled from source
-    from files(sourceSets.main.output.classesDir)
+    from files(sourceSets.main.output.classesDirs)
 }
 
 // loads the property file
 loadProperties('build.properties')
 
 // compiles and installs the vrl plugin to the specified folder
-task installVRLPlugin(dependsOn: [clean,jar]) << {
-    def vrlPluginPath = System.getenv()['HOME'] + "/" + vrldir+ "/plugin-updates"
-    println(">> copying vrl plugin to: " + vrlPluginPath)
-    copy {
-        from buildDir.getPath()+"/libs/"+rootProject.name + "-" + rootProject.version + ".jar"
-        into vrlPluginPath
-        include '**/*.jar'
+task installVRLPlugin(dependsOn: [clean,jar]) {
+    doLast {
+        def vrlPluginPath = System.getenv()['HOME'] + "/" + vrldir+ "/plugin-updates"
+        println(">> copying vrl plugin to: " + vrlPluginPath)
+        copy {
+            from buildDir.getPath()+"/libs/"+rootProject.name + "-" + rootProject.version + ".jar"
+            into vrlPluginPath
+            include '**/*.jar'
+        }
     }
 }
